@@ -7,7 +7,7 @@ A Python library for achieving consensus across multiple Large Language Models (
 ## Features
 
 - **Consensus**: Uses a moderator to iteratively coordinate multiple LLMs until consensus is reached
-- You can use any model supported by Langchain 
+- Can use any model supported by Langchain 
 - Supports web search for real-time data 
 
 ## Installation
