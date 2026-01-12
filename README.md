@@ -169,7 +169,7 @@ result = consensus.invoke(
 print(result['messages'][-1].content)
 ```
 
-### Example 3: Explicitly Setting Models
+### Example 3: Explicitly setting models
 
 ```python
 from typing import TypedDict
