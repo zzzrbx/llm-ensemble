@@ -127,7 +127,7 @@ Repeat until consensus or limit reached
 
 ## Examples
 
-### Example 1: With Custom Schema
+### Example 1: With custom schema
 
 ```python
 from typing import TypedDict
@@ -153,7 +153,7 @@ print(f"Answer: {result['final_answer']}")
 print(f"Notes: {result['notes']}")
 ```
 
-### Example 2: With no Structured Output and no Web Search
+### Example 2: No custom schema and no web search 
 
 ```python
 from llm_ensemble import Consensus
