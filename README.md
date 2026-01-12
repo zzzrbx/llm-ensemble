@@ -2,7 +2,7 @@
 
 ![LLM Ensemble Banner](.github/banner.png)
 
-A Python library for achieving consensus across multiple Large Language Models (LLMs) through an AI judge coordinator.
+A Python library for achieving consensus across multiple Large Language Models (LLMs).
 
 ## Features
 
