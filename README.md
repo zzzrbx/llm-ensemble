@@ -7,23 +7,26 @@ A Python library for achieving consensus across multiple Large Language Models (
 ## Features
 
 - **Consensus**: Uses an AI judge to iteratively coordinate multiple LLMs until consensus is reached
-- Support for GPT, Gemini, Claude, and Grok models out of the box
-- Built on LangChain and LangGraph for robust agent orchestration
-- **Advanced Middleware**: TodoList for task tracking, Filesystem for model name persistence, Summarization for context management, and ToolCallLimit for resource control
+- You can use any model supported by Langchain 
+- Supports web search for real-time data 
 
 ## Installation
 
 ```bash
+# Clone from GitHub
+git clone https://github.com/zzzrbx/llm-ensemble.git
+cd llm-ensemble
+
 # Using uv (recommended)
-uv add llm-ensemble
+uv sync
 
 # Using pip
-pip install llm-ensemble
+pip install -e .
 ```
 
 ## Environment Setup
 
-Create a `.env` file with your API keys:
+Create a `.env` file with your API keys, for example:
 
 ```bash
 OPENAI_API_KEY=your_openai_key
@@ -77,9 +80,9 @@ Consensus(
 )
 ```
 
-**Judge Model:** Configurable (default: `anthropic:claude-opus-4-5-20251101`). Claude Opus 4.5 provides the best reasoning capabilities for consensus coordination.
+**Judge Model:** Configurable (default: `anthropic:claude-opus-4-5-20251101`). It is recommended to use a high-reasoning model.
 
-**Available Tools for LLMs:**
+**Tools currently available for LLMs:**
 - `search_the_web` - Tavily web search for current events and factual data
 - `add`, `subtract`, `multiply`, `divide` - Math operations
 
@@ -116,15 +119,10 @@ Repeat until consensus or limit reached
 
 **Key Features:**
 - Judge is **unbiased** - determines consensus based only on LLM responses, not its own knowledge
-- Judge is **model-agnostic** - doesn't favor any LLM based on its name
-- **Task tracking** - TodoList middleware helps judge track agreements, disagreements, and next steps
-- **Model name persistence** - Filesystem middleware saves exact LLM identifiers to prevent hallucination
 - **Dynamic queries** - Judge crafts different prompts each iteration:
   - Iteration 1: Sends initial question with research instructions
   - Iteration 2+: Summarizes agreements, highlights disagreements, requests refinements
   - Final iteration: Presents refined consensus statement for confirmation
-- **Context management** - Judge provides full context each time (LLMs are stateless)
-- **Tool reminders** - Judge instructs LLMs to use `search_the_web` for current events/factual data, math tools for calculations
 - **Error handling** - Returns default values on timeout or tool call limit reached
 
 ## Examples
@@ -155,7 +153,7 @@ print(f"Answer: {result['final_answer']}")
 print(f"Notes: {result['notes']}")
 ```
 
-### Example 2: Without Structured Output
+### Example 2: Without Structured Output (No Web Search)
 
 ```python
 from llm_ensemble import Consensus
@@ -164,7 +162,7 @@ from llm_ensemble import Consensus
 consensus = Consensus()
 
 result = consensus.invoke(
-    "What are the latest developments in quantum computing as of January 2026?"
+    "What are the key differences between deontological and consequentialist ethics?"
 )
 
 # Access full agent result
@@ -261,4 +259,3 @@ Contributions are welcome! Please open an issue or submit a pull request.
 Built with:
 - [LangChain](https://langchain.com) - LLM framework
 - [LangGraph](https://langchain.com/langgraph) - Agent orchestration
-- [DeepAgents](https://github.com/langchain-ai/deepagents) - Deep agent capabilities
