@@ -186,7 +186,7 @@ consensus = Consensus(
 )
 
 result = consensus.invoke(
-    "What is the capital of France?\n\n"
+    "What is the capital of France?"
 )
 
 print(f"Consensus: {result['consensus']}")
