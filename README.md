@@ -153,7 +153,7 @@ print(f"Answer: {result['final_answer']}")
 print(f"Notes: {result['notes']}")
 ```
 
-### Example 2: Without Structured Output (No Web Search)
+### Example 2: With no Structured Output and no Web Search
 
 ```python
 from llm_ensemble import Consensus
