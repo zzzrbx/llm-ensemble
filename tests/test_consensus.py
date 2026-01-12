@@ -32,11 +32,7 @@ def test_sustainability_disclosure():
 
     # Complex question about civil disobedience and justice
     prompt = (
-        "When is Artificial General Intelligence (AGI)expected to emerge?\n\n"
-        "Use the web search to research.\n"
-        "- consensus: boolean indicating if consensus was reached\n"
-        "- final_answer: the agreed-upon answer to the question\n"
-        "- notes: process insights, key agreements or disagreements found"
+        "If survival is arbitrary, is moral judgment arbitrary too?"
     )
 
     print(f"\nPROMPT:\n{prompt}")

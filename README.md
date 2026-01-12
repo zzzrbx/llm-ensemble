@@ -6,10 +6,10 @@ A Python library for achieving consensus across multiple Large Language Models (
 
 ## Features
 
-- **Consensus**: Use a deep agent judge to iteratively coordinate multiple LLMs until consensus is reached
+- **Consensus**: Uses an AI judge to iteratively coordinate multiple LLMs until consensus is reached
 - Support for GPT, Gemini, Claude, and Grok models out of the box
 - Built on LangChain and LangGraph for robust agent orchestration
-- Configurable middleware for summarization, tool call limits, and more
+- **Advanced Middleware**: TodoList for task tracking, Filesystem for model name persistence, Summarization for context management, and ToolCallLimit for resource control
 
 ## Installation
 
@@ -117,6 +117,8 @@ Repeat until consensus or limit reached
 **Key Features:**
 - Judge is **unbiased** - determines consensus based only on LLM responses, not its own knowledge
 - Judge is **model-agnostic** - doesn't favor any LLM based on its name
+- **Task tracking** - TodoList middleware helps judge track agreements, disagreements, and next steps
+- **Model name persistence** - Filesystem middleware saves exact LLM identifiers to prevent hallucination
 - **Dynamic queries** - Judge crafts different prompts each iteration:
   - Iteration 1: Sends initial question with research instructions
   - Iteration 2+: Summarizes agreements, highlights disagreements, requests refinements

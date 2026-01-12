@@ -1,5 +1,7 @@
 from langchain.agents import create_agent
-from langchain.agents.middleware import SummarizationMiddleware, ToolCallLimitMiddleware
+from langchain.agents.middleware import TodoListMiddleware, SummarizationMiddleware, ToolCallLimitMiddleware
+from deepagents.middleware.filesystem import FilesystemMiddleware
+from deepagents.backends import StateBackend
 from langchain.chat_models import init_chat_model
 from langchain.tools import tool
 from .run_llm import RunLLM
@@ -71,11 +73,13 @@ class Consensus:
             run_llm = RunLLM(models=models, system_message=system_message)
             return run_llm.invoke(query)
 
-        # Create judge LLM using init_chat_model 
+        # Create judge LLM using init_chat_model
         llm = init_chat_model(judge_model)
 
-        # Create middleware (TodoList and Filesystem are enabled by default)
+        # Create middleware
         middleware = [
+            TodoListMiddleware(),
+            FilesystemMiddleware(backend=lambda rt: StateBackend(rt)),
             SummarizationMiddleware(
                 model="anthropic:claude-3-5-sonnet-20241022",
                 trigger=("tokens", summarization_trigger_tokens),
