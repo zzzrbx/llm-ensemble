@@ -169,54 +169,9 @@ result = consensus.invoke(
 print(result['messages'][-1].content)
 ```
 
-## Supported Models
-
-### OpenAI
-- `openai:gpt-5.2`
-- `openai:gpt-4o`
-- Any OpenAI model
-
-### Google
-- `google_genai:gemini-3-flash-preview`
-- `google_genai:gemini-2.0-flash-exp`
-- Any Google Gemini model
-
-### Anthropic
-- `anthropic:claude-opus-4-5-20251101`
-- `anthropic:claude-3-5-haiku-20241022`
-- Any Anthropic Claude model
-
-### xAI
-- `xai:grok-3-mini`
-- `xai:grok-3`
-- Any xAI Grok model
-
-## Testing
-
-Run the test suite:
-
-```bash
-# Test Consensus with civil disobedience question
-uv run python tests/test_consensus.py
-```
-
 ## Debugging and Observability
 
 The library integrates with LangSmith for trace observability. Set `LANGSMITH_API_KEY` and `LANGSMITH_PROJECT` in your `.env` file to enable tracing.
-
-**Analyzing Judge Behavior:**
-You can download and analyze traces to see how the judge dynamically refines prompts:
-
-```python
-# See llm_ensemble/debug/analyze_judge_prompts.py for an example
-# Downloads trace and shows how queries evolved across iterations
-```
-
-**What to look for in traces:**
-- How many iterations the judge needed to reach consensus
-- How the judge summarized agreements and disagreements
-- How queries evolved from iteration 1 → 2 → 3
-- Which models agreed/disagreed and when
 
 ## Development
 
