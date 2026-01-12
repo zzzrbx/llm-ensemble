@@ -175,11 +175,6 @@ print(result['messages'][-1].content)
 from typing import TypedDict
 from llm_ensemble import Consensus
 
-class UserSchema(TypedDict):
-    consensus: bool
-    final_answer: str
-    notes: str
-
 # Explicitly set which models to use for consensus
 consensus = Consensus(
     models=[
@@ -188,14 +183,10 @@ consensus = Consensus(
         "google:gemini-2.0-flash-exp"
     ],
     judge_model="anthropic:claude-opus-4-5-20251101",
-    response_schema=UserSchema
 )
 
 result = consensus.invoke(
     "What is the capital of France?\n\n"
-    "- consensus: boolean indicating if consensus was reached\n"
-    "- final_answer: the capital city\n"
-    "- notes: any observations about the consensus process"
 )
 
 print(f"Consensus: {result['consensus']}")
