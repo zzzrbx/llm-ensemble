@@ -13,15 +13,15 @@ A Python library for achieving consensus across multiple Agents.
 ## Installation
 
 ```bash
-# Clone from GitHub
+uv add multi-llm-consensus
+```
+
+Or install from source:
+
+```bash
 git clone https://github.com/zzzrbx/llm-ensemble.git
 cd llm-ensemble
-
-# Using uv (recommended)
 uv sync
-
-# Using pip
-pip install -e .
 ```
 
 ## Environment Setup

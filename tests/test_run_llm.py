@@ -1,4 +1,4 @@
-from .. import RunLLM
+from llm_ensemble import RunLLM
 
 
 def test_consensus_three_providers():
@@ -84,4 +84,4 @@ if __name__ == "__main__":
     print("#"*80)
     test_consensus_math_problem()
 
-    print("\n✅ All tests completed successfully!")
+    print("\n All tests completed successfully!")

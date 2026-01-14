@@ -1,13 +1,9 @@
-import sys
-from pathlib import Path
 from textwrap import dedent
 from typing import TypedDict
 
 from rich import print
 from rich.console import Console
 from rich.markdown import Markdown
-
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from llm_ensemble import Consensus
 
