@@ -2,7 +2,7 @@
 
 ![LLM Ensemble Banner](.github/banner.png)
 
-A Python library for achieving consensus across multiple Large Language Models (LLMs).
+A Python library for achieving consensus across multiple Agents.
 
 ## Features
 
