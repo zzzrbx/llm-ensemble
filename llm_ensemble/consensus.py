@@ -17,9 +17,9 @@ class Consensus:
 
     def __init__(
         self,
-        models: list[str] | None = None,
+        models: list[str],
         judge_model: str = "anthropic:claude-opus-4-5-20251101",
-        summarization_trigger_tokens: int = 200000,
+        summarization_trigger_tokens: int = 20_0000,
         summarization_keep_messages: int = 5,
         run_limit: int = 20,
         response_schema: Type | None = None
@@ -29,7 +29,6 @@ class Consensus:
 
         Args:
             models: List of model strings in format "provider:model-name".
-                   Defaults to GPT-5-mini, Gemini 3 Flash, Claude 3.5 Haiku, Grok 3 Mini.
             judge_model: Model string for the judge coordinator in format "provider:model-name".
                         Defaults to "anthropic:claude-opus-4-5-20251101".
             summarization_trigger_tokens: Token count to trigger summarization middleware.
@@ -37,41 +36,25 @@ class Consensus:
             run_limit: Maximum number of calls to run_llms tool per invocation.
             response_schema: Optional schema for structured output (TypedDict or Pydantic model).
                             If None, returns full agent result without structured output.
+
+        Raises:
+            ValueError: If models list is empty or contains only one model.
         """
-        # Set default models
-        if models is None:
-            models = [
-                "openai:gpt-5-mini",
-                "google_genai:gemini-3-flash-preview",
-                "anthropic:claude-3-5-haiku-20241022",
-                "xai:grok-3-mini",
-        ]
+        if not models:
+            raise ValueError("models list cannot be empty")
+        if len(models) < 2:
+            raise ValueError("models list must contain at least 2 models for consensus")
+
+        # Store as instance variables for use in tool creation
+        self.models = models
+        self.system_message = "You are a helpful AI assistant."
 
         # Load judge prompt
         judge_prompt_path = Path(__file__).parent / "prompts" / "judge.prompt"
         judge_prompt = judge_prompt_path.read_text()
 
-        # Set basic system message for RunLLM
-        system_message = "You are a helpful AI assistant."
-
-        # Create tool function as closure (captures models and system_message)
-        @tool
-        def run_llms(query: str) -> str:
-            """
-            Runs multiple LLMs in parallel on the same query.
-
-            Args:
-                query: The prompt/question to send to all LLMs. Include full context and
-                       any specific instructions (e.g., "use search_the_web for web search",
-                       "use add/multiply/subtract/divide tools for calculations").
-
-            Returns:
-                Aggregated responses from all LLMs. Each response is prefixed with the
-                exact model identifier (e.g., "openai:gpt-5-mini:", "google_genai:gemini-3-flash-preview:").
-                Always refer to models by these exact identifiers in your analysis.
-            """
-            run_llm = RunLLM(models=models, system_message=system_message)
-            return run_llm.invoke(query)
+        # Create the run_llms tool
+        run_llms = self._create_run_llms_tool()
 
         # Create judge LLM using init_chat_model
         llm = init_chat_model(judge_model)
@@ -110,6 +93,33 @@ class Consensus:
             )
 
         self._response_schema = response_schema
+
+    def _create_run_llms_tool(self):
+        """
+        Creates the run_llms tool with access to instance variables.
+
+        Returns:
+            A LangChain tool that runs multiple LLMs in parallel.
+        """
+        @tool
+        def run_llms(query: str) -> str:
+            """
+            Runs multiple LLMs in parallel on the same query.
+
+            Args:
+                query: The prompt/question to send to all LLMs. Include full context and
+                       any specific instructions (e.g., "use search_the_web for web search",
+                       "use add/multiply/subtract/divide tools for calculations").
+
+            Returns:
+                Aggregated responses from all LLMs. Each response is prefixed with the
+                exact model identifier (e.g., "openai:gpt-5-mini:", "google_genai:gemini-3-flash-preview:").
+                Always refer to models by these exact identifiers in your analysis.
+            """
+            run_llm = RunLLM(models=self.models, system_message=self.system_message)
+            return run_llm.invoke(query)
+
+        return run_llms
 
     def invoke(self, prompt: str):
         """

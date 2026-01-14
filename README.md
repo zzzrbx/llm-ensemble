@@ -51,27 +51,31 @@ class UserSchema(TypedDict):
     notes: str
 
 # Initialize with custom schema
-consensus = Consensus(response_schema=UserSchema)
+consensus = Consensus(
+    models=[
+        "openai:gpt-5-mini",
+        "google_genai:gemini-3-flash-preview",
+        "anthropic:claude-3-5-haiku-20241022",
+        "xai:grok-3-mini",
+    ],
+    response_schema=UserSchema
+)
 
 # Get consensus on a question
 result = consensus.invoke(
-    "When is Artificial General Intelligence (AGI) expected to emerge?\n\n"
-    "Use the web search to research.\n"
-    "- consensus: boolean indicating if consensus was reached\n"
-    "- final_answer: the agreed-upon answer to the question\n"
-    "- notes: process insights, key agreements or disagreements found"
+    "If survival is arbitrary, is moral judgment arbitrary too?"
 )
 
 print(f"Consensus: {result['consensus']}")
-print(f"\nFinal Answer:\n{result['final_answer']}")
-print(f"\nNotes:\n{result['notes']}")
+print(f"Final Answer: {result['final_answer']}")
+print(f"Notes: {result['notes']}")
 ```
 
 ## Configuration
 
 ```python
 Consensus(
-    models: list[str] | None = None,                    # Default: GPT-5-mini, Gemini 3 Flash, Claude 3.5 Haiku, Grok 3 Mini
+    models: list[str],                                  # Required: list of models in "provider:model-name" format
     judge_model: str = "anthropic:claude-opus-4-5-20251101",  # Judge coordinator model (default: Claude Opus 4.5)
     summarization_trigger_tokens: int = 200000,         # Token threshold for summarization
     summarization_keep_messages: int = 5,               # Messages to keep after summarization
@@ -127,7 +131,7 @@ Repeat until consensus or limit reached
 
 ## Examples
 
-### Example 1: With custom schema
+### Example 1: With structured output
 
 ```python
 from typing import TypedDict
@@ -138,14 +142,18 @@ class UserSchema(TypedDict):
     final_answer: str
     notes: str
 
-consensus = Consensus(response_schema=UserSchema)
+consensus = Consensus(
+    models=[
+        "openai:gpt-5-mini",
+        "google_genai:gemini-3-flash-preview",
+        "anthropic:claude-3-5-haiku-20241022",
+        "xai:grok-3-mini",
+    ],
+    response_schema=UserSchema
+)
 
 result = consensus.invoke(
-    "When is Artificial General Intelligence (AGI) expected to emerge?\n\n"
-    "Use the web search to research.\n"
-    "- consensus: boolean indicating if consensus was reached\n"
-    "- final_answer: the agreed-upon answer to the question\n"
-    "- notes: process insights, key agreements or disagreements found"
+    "If survival is arbitrary, is moral judgment arbitrary too?"
 )
 
 print(f"Consensus: {result['consensus']}")
@@ -153,77 +161,33 @@ print(f"Answer: {result['final_answer']}")
 print(f"Notes: {result['notes']}")
 ```
 
-### Example 2: No custom schema and no web search 
+### Example 2: No structured output with web search
 
 ```python
 from llm_ensemble import Consensus
 
 # No response_schema - returns full agent result
-consensus = Consensus()
+consensus = Consensus(
+    models=[
+        "openai:gpt-5-mini",
+        "google_genai:gemini-3-flash-preview",
+        "anthropic:claude-3-5-haiku-20241022",
+        "xai:grok-3-mini",
+    ]
+)
 
 result = consensus.invoke(
-    "What are the key differences between deontological and consequentialist ethics?"
+    "What are the latest developments in quantum computing?\n\n"
+    "Use the web search to research current news and breakthroughs."
 )
 
 # Access full agent result
 print(result['messages'][-1].content)
 ```
 
-### Example 3: Explicitly setting models
-
-```python
-from typing import TypedDict
-from llm_ensemble import Consensus
-
-# Explicitly set which models to use for consensus
-consensus = Consensus(
-    models=[
-        "openai:gpt-4o",
-        "anthropic:claude-3-5-sonnet-20241022",
-        "google:gemini-2.0-flash-exp"
-    ],
-    judge_model="anthropic:claude-opus-4-5-20251101",
-)
-
-result = consensus.invoke(
-    "What is the capital of France?"
-)
-
-print(f"Consensus: {result['consensus']}")
-print(f"Answer: {result['final_answer']}")
-```
-
 ## Debugging and Observability
 
 The library integrates with LangSmith for trace observability. Set `LANGSMITH_API_KEY` and `LANGSMITH_PROJECT` in your `.env` file to enable tracing.
-
-## Development
-
-### Project Structure
-
-```
-llm-ensemble/
-├── llm_ensemble/
-│   ├── __init__.py
-│   ├── run_llm.py        # Parallel LLM execution (internal)
-│   ├── consensus.py      # Consensus class (main API)
-│   ├── utils.py               # Tool definitions
-│   ├── schemas/
-│   │   └── schemas.py         # State schemas
-│   └── prompts/
-│       └── judge.prompt       # Judge system prompt
-├── tests/
-│   └── test_consensus.py      # Consensus tests
-└── README.md
-```
-
-### Requirements
-
-- Python 3.12+
-- LangChain 1.2.3+
-- LangGraph 1.0.5+
-- DeepAgents 0.1.0+
-- API keys for OpenAI, Anthropic, Google, xAI (optional: based on models used)
 
 ## License
 
@@ -233,8 +197,4 @@ MIT License
 
 Contributions are welcome! Please open an issue or submit a pull request.
 
-## Acknowledgments
 
-Built with:
-- [LangChain](https://langchain.com) - LLM framework
-- [LangGraph](https://langchain.com/langgraph) - Agent orchestration

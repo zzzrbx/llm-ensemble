@@ -1,21 +1,26 @@
 import sys
 from pathlib import Path
+from textwrap import dedent
 from typing import TypedDict
 
-# Add parent directory to path to import llm-ensemble module
+from rich import print
+from rich.console import Console
+from rich.markdown import Markdown
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from llm_ensemble import Consensus
 
+console = Console()
 
 class UserSchema(TypedDict):
     """Output schema for sustainability consensus test."""
-    consensus: bool  # Whether consensus was reached among LLMs
+    consensus: bool    # Whether consensus was reached among agents
     final_answer: str  # The agreed-upon answer to the question
-    notes: str  # Process insights, key points of agreement/disagreement
+    notes: str         # Process insights, key points of agreement/disagreement
 
 
-def test_sustainability_disclosure():
+def test_schema():
     """
     Test Consensus with a complex sustainability governance question.
 
@@ -24,13 +29,19 @@ def test_sustainability_disclosure():
     to corporations.
     """
     print("\n" + "="*80)
-    print("CONSENSUS TEST - Sustainability Disclosure & Accountability")
+    print("CONSENSUS TEST - With schema")
     print("="*80)
 
-    # Initialize Consensus with custom schema
-    consensus = Consensus(response_schema=UserSchema)
+    consensus = Consensus(
+        models=[
+            "openai:gpt-5-mini",
+            "google_genai:gemini-3-flash-preview",
+            "anthropic:claude-3-5-haiku-20241022",
+            "xai:grok-3-mini",
+        ],
+        response_schema=UserSchema
+    )
 
-    # Complex question about civil disobedience and justice
     prompt = (
         "If survival is arbitrary, is moral judgment arbitrary too?"
     )
@@ -40,20 +51,63 @@ def test_sustainability_disclosure():
     print("Running consensus process (may require multiple iterations)...")
     print("-"*80)
 
-    # Invoke consensus process
     result = consensus.invoke(prompt)
 
-    # Print results
     print("\nRESULT:")
-    print(f"Consensus Reached: {result['consensus']}")
-    print(f"\nFinal Answer:\n{result['final_answer']}")
-    print(f"\nNotes:\n{result['notes']}")
+    result_md = dedent(f"""
+        ## Consensus Reached: {result['consensus']}
+
+        ## Final Answer
+        {result['final_answer']}
+
+        ## Notes
+        {result['notes']}
+    """)
+    console.print(Markdown(result_md))
+    print("="*80)
+
+
+def test_web_search_no_schema():
+    """
+    Test Consensus with web search and no structured output.
+
+    This test uses web search to get current information and returns
+    the full agent result without a custom schema.
+    """
+    print("\n" + "="*80)
+    print("CONSENSUS TEST - Web Search Without Structured Output")
+    print("="*80)
+
+    consensus = Consensus(
+        models=[
+            "openai:gpt-5-mini",
+            "google_genai:gemini-3-flash-preview",
+            "anthropic:claude-3-5-haiku-20241022",
+            "xai:grok-3-mini",
+        ]
+    )
+
+    prompt = (
+        "What are the latest developments in quantum computing?\n\n"
+        "Use the web search to research current news and breakthroughs."
+    )
+
+    print(f"\nPROMPT:\n{prompt}")
+    print("-"*80)
+    print("Running consensus process (may require multiple iterations)...")
+    print("-"*80)
+
+    result = consensus.invoke(prompt)
+
+    print("\nRESULT:")
+    console.print(Markdown(result['messages'][-1].content))
     print("="*80)
 
 
 if __name__ == "__main__":
-    print("Running Sustainability Consensus Test...")
+    print("Running Consensus Tests...")
 
-    test_sustainability_disclosure()
+    test_schema()
+    test_web_search_no_schema()
 
-    print("\n✅ Test completed successfully!")
+    print("\n✅ Tests completed successfully!")
