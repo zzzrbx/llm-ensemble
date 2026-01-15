@@ -7,7 +7,7 @@ A Python library for achieving consensus across multiple Agents.
 ## Features
 
 - **Consensus**: Uses a moderator to iteratively coordinate multiple LLMs until consensus is reached
-- Can use any model supported by Langchain 
+- Can use any model API based model such as OpenAI, Anthropic, Gemini, Grok supported by Langgraph
 - Supports web search for real-time data 
 
 ## Installation
@@ -36,6 +36,8 @@ XAI_API_KEY=your_xai_key
 TAVILY_API_KEY=your_tavily_key  # For web search
 ```
 
+You must provide at least two API keys for the models you want to use in the ensemble.
+
 ## How It Works
 
 ```
@@ -55,7 +57,6 @@ Repeat until consensus or limit reached
 ```
 
 **Key Features:**
-- Judge is **unbiased** - determines consensus based only on LLM responses, not its own knowledge
 - **Dynamic queries** - Judge crafts different prompts each iteration:
   - Iteration 1: Sends initial question with research instructions
   - Iteration 2+: Summarizes agreements, highlights disagreements, requests refinements
@@ -99,7 +100,7 @@ print(f"Answer: {result['final_answer']}")
 print(f"Notes: {result['notes']}")
 ```
 
-### Example 2: No structured output with web search
+### Example 2: No structured output with web search enabled (you just need to mention it in the prompt)
 
 ```python
 from llm_ensemble import Consensus
