@@ -1,6 +1,6 @@
 [project]
 name = "multi-llm-consensus"
-version = "0.1.0"
+version = "0.1.2"
 description = "Achieve consensus across multiple LLMs through an AI judge coordinator"
 readme = "README.md"
 license = {text = "MIT"}
