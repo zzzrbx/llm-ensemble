@@ -19,7 +19,8 @@ class Consensus:
         self,
         models: list[str],
         judge_model: str = "anthropic:claude-opus-4-5-20251101",
-        summarization_trigger_tokens: int = 20_0000,
+        summarization_model: str = "claude-4-5-sonnet-20250929",
+        summarization_trigger_tokens: int = 200_000,
         summarization_keep_messages: int = 5,
         run_limit: int = 20,
         response_schema: Type | None = None
@@ -31,6 +32,8 @@ class Consensus:
             models: List of model strings in format "provider:model-name".
             judge_model: Model string for the judge coordinator in format "provider:model-name".
                         Defaults to "anthropic:claude-opus-4-5-20251101".
+            summarization_model: Model string for summarization middleware in format "provider:model-name".
+                        Defaults to "anthropic:claude-3-5-sonnet-20241022".
             summarization_trigger_tokens: Token count to trigger summarization middleware.
             summarization_keep_messages: Number of messages to keep after summarization.
             run_limit: Maximum number of calls to run_llms tool per invocation.
@@ -64,7 +67,7 @@ class Consensus:
             TodoListMiddleware(),
             FilesystemMiddleware(backend=lambda rt: StateBackend(rt)),
             SummarizationMiddleware(
-                model="anthropic:claude-3-5-sonnet-20241022",
+                model=summarization_model,
                 trigger=("tokens", summarization_trigger_tokens),
                 keep=("messages", summarization_keep_messages)
             ),
