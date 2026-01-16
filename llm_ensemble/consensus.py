@@ -6,7 +6,7 @@ from langchain.chat_models import init_chat_model
 from langchain.tools import tool
 from .run_llm import RunLLM
 from pathlib import Path
-from typing import Type
+from typing import Any, Type
 
 
 class Consensus:
@@ -24,7 +24,7 @@ class Consensus:
         summarization_keep_messages: int = 5,
         run_limit: int = 20,
         response_schema: Type | None = None
-    ):
+    ) -> None:
         """
         Initialize the Consensus class.
 
@@ -52,9 +52,9 @@ class Consensus:
         self.models = models
         self.system_message = "You are a helpful AI assistant."
 
-        # Load judge prompt
+        # Load judge prompt and inject run_limit
         judge_prompt_path = Path(__file__).parent / "prompts" / "judge.prompt"
-        judge_prompt = judge_prompt_path.read_text()
+        judge_prompt = judge_prompt_path.read_text().format(run_limit=run_limit)
 
         # Create the run_llms tool
         run_llms = self._create_run_llms_tool()
@@ -97,7 +97,7 @@ class Consensus:
 
         self._response_schema = response_schema
 
-    def _create_run_llms_tool(self):
+    def _create_run_llms_tool(self) -> Any:
         """
         Creates the run_llms tool with access to instance variables.
 
@@ -124,7 +124,7 @@ class Consensus:
 
         return run_llms
 
-    def invoke(self, prompt: str):
+    def invoke(self, prompt: str) -> dict | None:
         """
         Invoke the consensus process with a user query.
 

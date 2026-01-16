@@ -1,5 +1,8 @@
+from typing import Any, Callable
+
 from dotenv import load_dotenv
 from langgraph.graph import StateGraph, START, END
+from langgraph.graph.state import CompiledStateGraph
 from langchain.agents import create_agent
 from .utils import add, subtract, multiply, divide, search_the_web
 from .schemas import InputState, OutputState, RunLLMState
@@ -14,7 +17,7 @@ class RunLLM:
     then aggregates their responses.
     """
 
-    def __init__(self, models: list[str], system_message: str):
+    def __init__(self, models: list[str], system_message: str) -> None:
         """
         Initialize the RunLLM class.
 
@@ -49,7 +52,7 @@ class RunLLM:
         # Build and compile the StateGraph
         self._graph = self._build_graph()
 
-    def _build_graph(self):
+    def _build_graph(self) -> CompiledStateGraph:
         """
         Build and compile the StateGraph.
 
@@ -64,7 +67,7 @@ class RunLLM:
         )
 
         # Factory function to create model nodes with proper closure
-        def make_model_node(model_name: str, agent):
+        def make_model_node(model_name: str, agent: Any) -> Callable[[RunLLMState], dict]:
             """Factory function to create a node function with proper closure."""
             def node_function(state: RunLLMState) -> dict:
                 prompt = state["prompt"]
