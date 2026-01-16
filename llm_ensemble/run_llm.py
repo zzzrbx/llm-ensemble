@@ -1,7 +1,9 @@
+from typing import Any, Callable
+
 from dotenv import load_dotenv
 from langgraph.graph import StateGraph, START, END
-from langgraph.prebuilt import create_react_agent
-from langchain_core.messages import SystemMessage, HumanMessage
+from langgraph.graph.state import CompiledStateGraph
+from langchain.agents import create_agent
 from .utils import add, subtract, multiply, divide, search_the_web
 from .schemas import InputState, OutputState, RunLLMState
 
@@ -15,7 +17,7 @@ class RunLLM:
     then aggregates their responses.
     """
 
-    def __init__(self, models: list[str], system_message: str):
+    def __init__(self, models: list[str], system_message: str) -> None:
         """
         Initialize the RunLLM class.
 
@@ -35,21 +37,22 @@ class RunLLM:
             divide
         ]
 
-        # Initialize react agents for each model
+        # Initialize agents for each model
         self._agents = {}
         for model_string in models:
-            # Pass model string directly to create_react_agent
+            # Pass model string directly to create_agent
             # LangChain's init_chat_model handles provider parsing automatically
-            agent = create_react_agent(
+            agent = create_agent(
                 model=model_string,
-                tools=tools
+                tools=tools,
+                system_prompt=self._system_message
             )
             self._agents[model_string] = agent
 
         # Build and compile the StateGraph
         self._graph = self._build_graph()
 
-    def _build_graph(self):
+    def _build_graph(self) -> CompiledStateGraph:
         """
         Build and compile the StateGraph.
 
@@ -59,21 +62,18 @@ class RunLLM:
         # Initialize StateGraph with input/output schemas
         graph = StateGraph(
             state_schema=RunLLMState,
-            input=InputState,
-            output=OutputState
+            input_schema=InputState,
+            output_schema=OutputState
         )
 
         # Factory function to create model nodes with proper closure
-        def make_model_node(model_name: str, agent, system_message: str):
+        def make_model_node(model_name: str, agent: Any) -> Callable[[RunLLMState], dict]:
             """Factory function to create a node function with proper closure."""
             def node_function(state: RunLLMState) -> dict:
                 prompt = state["prompt"]
-                # Invoke react agent with system message and user prompt
+                # Invoke agent with user prompt
                 result = agent.invoke({
-                    "messages": [
-                        SystemMessage(content=system_message),
-                        HumanMessage(content=prompt)
-                    ]
+                    "messages": [{"role": "user", "content": prompt}]
                 })
                 # Extract final AI message content
                 content = result["messages"][-1].content
@@ -97,8 +97,7 @@ class RunLLM:
         for model_name in self._models:
             node_fn = make_model_node(
                 model_name,
-                self._agents[model_name],
-                self._system_message
+                self._agents[model_name]
             )
             # Sanitize node name by replacing : with _
             sanitized_node_name = model_name.replace(":", "_")
