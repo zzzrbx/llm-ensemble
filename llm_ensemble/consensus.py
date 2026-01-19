@@ -19,7 +19,7 @@ class Consensus:
         self,
         models: list[str],
         judge_model: str = "anthropic:claude-opus-4-5-20251101",
-        summarization_model: str = "claude-4-5-sonnet-20250929",
+        summarization_model: str = "anthropic:claude-sonnet-4-5-20250929",
         summarization_trigger_tokens: int = 200_000,
         summarization_keep_messages: int = 5,
         run_limit: int = 20,
