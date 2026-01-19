@@ -1,5 +1,3 @@
-# LLM Ensemble
-
 ![LLM Ensemble Banner](.github/banner.png)
 
 A Python library for achieving consensus across multiple Agents.
