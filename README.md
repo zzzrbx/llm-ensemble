@@ -1,5 +1,7 @@
 ![LLM Ensemble Banner](.github/banner.png)
 
+![Pylint](https://github.com/zzzrbx/llm-ensemble/actions/workflows/pylint.yml/badge.svg)
+
 A Python library for achieving consensus across multiple Agents.
 
 ## Features
