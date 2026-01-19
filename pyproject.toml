@@ -50,3 +50,12 @@ artifacts = ["*.prompt"]
 dev = [
     "pytest>=9.0.2",
 ]
+
+[tool.pylint.messages_control]
+disable = [
+    "missing-module-docstring",
+    "too-many-arguments",
+    "too-many-positional-arguments",
+    "too-few-public-methods",
+    "broad-exception-caught",
+]
