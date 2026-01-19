@@ -1,12 +1,18 @@
-from langchain.agents import create_agent
-from langchain.agents.middleware import TodoListMiddleware, SummarizationMiddleware, ToolCallLimitMiddleware
-from deepagents.middleware.filesystem import FilesystemMiddleware
-from deepagents.backends import StateBackend
-from langchain.chat_models import init_chat_model
-from langchain.tools import tool
-from .run_llm import RunLLM
 from pathlib import Path
 from typing import Any, Type
+
+from deepagents.backends import StateBackend
+from deepagents.middleware.filesystem import FilesystemMiddleware
+from langchain.agents import create_agent
+from langchain.agents.middleware import (
+    SummarizationMiddleware,
+    TodoListMiddleware,
+    ToolCallLimitMiddleware,
+)
+from langchain.chat_models import init_chat_model
+from langchain.tools import tool
+
+from .run_llm import RunLLM
 
 
 class Consensus:
@@ -32,7 +38,7 @@ class Consensus:
             models: List of model strings in format "provider:model-name".
             judge_model: Model string for the judge coordinator in format "provider:model-name".
                         Defaults to "anthropic:claude-opus-4-5-20251101".
-            summarization_model: Model string for summarization middleware in format "provider:model-name".
+            summarization_model: Model string for summarization middleware.
                         Defaults to "anthropic:claude-3-5-sonnet-20241022".
             summarization_trigger_tokens: Token count to trigger summarization middleware.
             summarization_keep_messages: Number of messages to keep after summarization.
@@ -65,7 +71,7 @@ class Consensus:
         # Create middleware
         middleware = [
             TodoListMiddleware(),
-            FilesystemMiddleware(backend=lambda rt: StateBackend(rt)),
+            FilesystemMiddleware(backend=StateBackend),
             SummarizationMiddleware(
                 model=summarization_model,
                 trigger=("tokens", summarization_trigger_tokens),
@@ -115,8 +121,8 @@ class Consensus:
                        "use add/multiply/subtract/divide tools for calculations").
 
             Returns:
-                Aggregated responses from all LLMs. Each response is prefixed with the
-                exact model identifier (e.g., "openai:gpt-5-mini:", "google_genai:gemini-3-flash-preview:").
+                Aggregated responses from all LLMs. Each response is prefixed with
+                the exact model identifier (e.g., "openai:gpt-5-mini:").
                 Always refer to models by these exact identifiers in your analysis.
             """
             run_llm = RunLLM(models=self.models, system_message=self.system_message)
@@ -141,8 +147,7 @@ class Consensus:
             })
             if self._response_schema is not None:
                 return result["structured_response"]
-            else:
-                return result
+            return result
         except Exception as e:
             # Tool call limit reached or other error
             print(f"Error during consensus: {str(e)}")
@@ -161,5 +166,4 @@ class Consensus:
                         else:
                             default_dict[key] = None
                 return default_dict if default_dict else None
-            else:
-                return None
+            return None

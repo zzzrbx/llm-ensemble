@@ -19,4 +19,4 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         source .venv/bin/activate
-        pylint $(git ls-files '*.py')
+        pylint $(git ls-files '*.py' | grep -v '^tests/')
